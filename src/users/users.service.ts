@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { User } from '@prisma/client';
 import { MailerService } from '../mailer/mailer.service';
 import * as argon2 from 'argon2';
+import { AddUserDto } from '../dto/users.dto';
 
 type CreateUserData = {
     email: string;
@@ -20,17 +21,23 @@ export class UsersService {
         return this._prisma.user.findMany();
     }
 
-    async create(userData: CreateUserData) {
-        try {
-            const { email, password } = userData;
+    async add(userData: AddUserDto) {
+        const { email } = userData;
 
-            // Need check if address email is already in use
-
-            const passwordHash = await argon2.hash(password);
-        } catch (error: unknown) {
-            // Do something with error
-        }
+        return this._mailerService.sendEmail(email);
     }
+
+    // async create(userData: CreateUserData) {
+    //     try {
+    //         const { email, password } = userData;
+    //
+    //         // Need check if address email is already in use
+    //
+    //         const passwordHash = await argon2.hash(password);
+    //     } catch (error: unknown) {
+    //         // Do something with error
+    //     }
+    // }
     //
     // async active() {}
     //
