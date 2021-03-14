@@ -13,6 +13,23 @@ generator client {
 
 model User {
     id          String      @id @default(uuid())
+    profile_id  Profile?
     email       String      @unique
     password    String
+    role        Int
+    is_active   Boolean     @default(false)
+    created_at  DateTime    @default(now())
+    updated_at  DateTime    @default(now())
+}
+
+model Profile {
+    id              String      @id @default(uuid())
+    user            User        @relation(fields: [user_id], references: [id])
+    user_id         String
+    first_name      String
+    last_name       String
+    photo           String
+    phone_number    String
+    city            String
+    description     String
 }

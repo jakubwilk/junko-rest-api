@@ -4,10 +4,10 @@ import { User } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly userService: UsersService) {}
+    constructor(private readonly _userService: UsersService) {}
 
-    @Get('/auth')
-    async verificationMail() {
-        return this.userService.users();
+    @Get('/')
+    async getUsersList() {
+        return this._userService.users();
     }
 }

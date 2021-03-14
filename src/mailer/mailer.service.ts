@@ -3,7 +3,7 @@ import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 
 @Injectable()
 export class MailerService {
-    constructor(@InjectSendGrid() private readonly client: SendGridService) {}
+    constructor(@InjectSendGrid() private readonly _client: SendGridService) {}
 
     async sendEmail() {
         const msg = {
@@ -14,7 +14,7 @@ export class MailerService {
             html: '<strong>Test HTML partial</strong>',
         };
 
-        this.client
+        this._client
             .send(msg)
             .then(() => {
                 console.log('Email sent');
