@@ -31,9 +31,11 @@ export class MailerService {
 
         if (!message) {
             throw new HttpException(
-                'Server Error during send message. Please contact with administrator of this website.',
+                'Wystąpił błąd podczas wysyłania wiadomości. Proszę skontaktować się z administratorem po więcej informacji.',
                 500,
             );
         }
+
+        return 'Email pomyślnie wysłano. Proszę sprawdzić swoją skrzynkę pocztową';
     }
 }

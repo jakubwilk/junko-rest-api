@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { AddUserDto } from '../dto/users.dto';
@@ -13,7 +13,10 @@ export class UsersController {
     }
 
     @Post('/add')
+    @HttpCode(200)
     async addUser(@Body() userData: AddUserDto) {
-        return this._userService.add(userData);
+        const responseText: string = await this._userService.add(userData);
+
+        return { statusCode: 200, message: responseText };
     }
 }
