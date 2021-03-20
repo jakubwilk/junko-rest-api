@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 
 type EmailData = {
@@ -13,7 +13,7 @@ type EmailData = {
 export class MailerService {
     constructor(@InjectSendGrid() private readonly _client: SendGridService) {}
 
-    async sendEmail(email: string) {
+    async sendEmail(email: string, token: string): Promise<boolean> {
         const msg: EmailData = {
             to: email,
             from: 'jw@jakubwilk.pl',
@@ -23,7 +23,7 @@ export class MailerService {
                 <p>Witaj, by dokończyć proces rejestracji proszę ustawić hasło na konta: <br />
                     <strong>${email}</strong>
                 </p>
-                <a href="https://www.google.com" target="_blank">custom_url_with_token</a>
+                <a href="http://localhost:3000/users/${token}" target="_blank">custom_url_with_token</a>
             `,
         };
 
@@ -32,10 +32,10 @@ export class MailerService {
         if (!message) {
             throw new HttpException(
                 'Wystąpił błąd podczas wysyłania wiadomości. Proszę skontaktować się z administratorem po więcej informacji.',
-                500,
+                HttpStatus.INTERNAL_SERVER_ERROR,
             );
         }
 
-        return 'Email pomyślnie wysłano. Proszę sprawdzić swoją skrzynkę pocztową';
+        return true;
     }
 }

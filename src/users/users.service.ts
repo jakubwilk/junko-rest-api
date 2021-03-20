@@ -4,6 +4,8 @@ import { User } from '@prisma/client';
 import { MailerService } from '../mailer/mailer.service';
 import * as argon2 from 'argon2';
 import { AddUserDto } from '../dto/users.dto';
+import { AuthService } from '../auth/auth.service';
+import { UserInitializeToken } from '../types/auth.types';
 
 type CreateUserData = {
     email: string;
@@ -13,6 +15,7 @@ type CreateUserData = {
 @Injectable()
 export class UsersService {
     constructor(
+        private _authService: AuthService,
         private _mailerService: MailerService,
         private _prisma: PrismaService,
     ) {}
@@ -24,7 +27,12 @@ export class UsersService {
     async add(userData: AddUserDto) {
         const { email } = userData;
 
-        return this._mailerService.sendEmail(email);
+        const data: UserInitializeToken = {
+            email: email,
+            expireIn: '1h',
+        };
+        const token: string = await this._authService.createToken(data);
+        return this._mailerService.sendEmail(email, token);
     }
 
     // async create(userData: CreateUserData) {

@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { MailerModule } from './mailer/mailer.module';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-    imports: [
-        UsersModule,
-        MailerModule,
-        JwtModule.register({ secret: process.env['JWT_SECRET'] }),
-    ],
+    imports: [UsersModule, MailerModule, AuthModule],
     controllers: [],
     providers: [],
 })
