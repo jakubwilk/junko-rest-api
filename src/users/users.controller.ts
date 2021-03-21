@@ -8,9 +8,9 @@ import {
     Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from '@prisma/client';
-import { AddUserDto } from '../dto/users.dto';
+import { AddUserDto, CreateUserDto } from '../dto/users.dto';
 import { AuthService } from '../auth/auth.service';
+import { CreateUserData } from '../types/user.types';
 
 @Controller('users')
 export class UsersController {
@@ -30,6 +30,27 @@ export class UsersController {
         await this._authService.isValidToken(token);
 
         return { statusCode: HttpStatus.OK };
+    }
+
+    @Post('/add/:token')
+    @HttpCode(HttpStatus.CREATED)
+    async createUser(
+        @Param('token') token: string,
+        @Body() userData: CreateUserDto,
+    ) {
+        const { password } = userData;
+        const email: string = await this._authService.extractValueFromPayload(
+            token,
+            'email',
+        );
+        const data: CreateUserData = {
+            email: email,
+            password: password,
+        };
+
+        await this._userService.create(data);
+
+        return { statusCode: HttpStatus.CREATED };
     }
 
     @Post('/add')

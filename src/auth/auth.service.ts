@@ -23,4 +23,14 @@ export class AuthService {
             throw new HttpException(err, HttpStatus.UNAUTHORIZED);
         }
     }
+
+    async extractValueFromPayload(
+        token: string,
+        value: string,
+    ): Promise<string> {
+        await this.isValidToken(token);
+
+        const field = await this.jwtService.decode(token);
+        return field[value];
+    }
 }

@@ -17,13 +17,13 @@ export class MailerService {
         const msg: EmailData = {
             to: email,
             from: 'jw@jakubwilk.pl',
-            subject: 'Autorization Code',
-            text: 'Your authorization code to finish register',
+            subject: 'Dokończenie rejestracji',
+            text: 'Twój link autoryzacyjny do ukończenia rejestracji',
             html: `
                 <p>Witaj, by dokończyć proces rejestracji proszę ustawić hasło na konta: <br />
                     <strong>${email}</strong>
                 </p>
-                <a href="http://localhost:3000/users/${token}" target="_blank">custom_url_with_token</a>
+                <a href="http://localhost:3000/users/${token}" target="_blank">http://localhost:3000/users/${token}</a>
             `,
         };
 
