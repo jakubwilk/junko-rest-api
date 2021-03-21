@@ -21,9 +21,10 @@ export class UsersService {
     }
 
     async add(userData: AddUserDto) {
-        const { email } = userData;
+        const { email, role } = userData;
         const data: UserInitializeToken = {
             email: email,
+            role: role,
             expireIn: '1h',
         };
         const token: string = await this._authService.createToken(data);
@@ -32,7 +33,7 @@ export class UsersService {
     }
 
     async create(userData: CreateUserData): Promise<boolean> {
-        const { email, password } = userData;
+        const { email, role, password } = userData;
 
         const isEmailUsed: User | null = await this._prisma.user.findUnique({
             where: { email: email },
@@ -51,7 +52,7 @@ export class UsersService {
             data: {
                 email: email,
                 password: passwordHash,
-                role: 1,
+                role: role,
             },
         });
 

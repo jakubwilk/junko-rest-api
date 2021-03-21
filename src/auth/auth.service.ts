@@ -7,9 +7,12 @@ export class AuthService {
     constructor(private jwtService: JwtService) {}
 
     async createToken(data: UserInitializeToken): Promise<string> {
-        const { email, expireIn } = data;
+        const { email, role, expireIn } = data;
 
-        return this.jwtService.sign({ email: email }, { expiresIn: expireIn });
+        return this.jwtService.sign(
+            { email: email, role: role },
+            { expiresIn: expireIn },
+        );
     }
 
     async isValidToken(token: string): Promise<boolean> {
@@ -31,6 +34,7 @@ export class AuthService {
         await this.isValidToken(token);
 
         const field = await this.jwtService.decode(token);
+
         return field[value];
     }
 }

@@ -1,5 +1,6 @@
 export type UserInitializeToken = {
     email: string;
+    role: string;
     expireIn: string | number;
 };
 

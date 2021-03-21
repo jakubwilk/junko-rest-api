@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 import { AddUserDto, CreateUserDto } from '../dto/users.dto';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserData } from '../types/user.types';
+import { ROLES } from '../enum/roles';
 
 @Controller('users')
 export class UsersController {
@@ -43,10 +44,16 @@ export class UsersController {
             token,
             'email',
         );
+        const role: string = await this._authService.extractValueFromPayload(
+            token,
+            'role',
+        );
         const data: CreateUserData = {
             email: email,
             password: password,
+            role: ROLES[role],
         };
+        data.role = Number(ROLES[data.role]);
 
         await this._userService.create(data);
 
