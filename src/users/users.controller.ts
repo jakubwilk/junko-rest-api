@@ -6,12 +6,14 @@ import {
     HttpStatus,
     Param,
     Post,
+    Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AddUserDto, CreateUserDto } from '../dto/users.dto';
+import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/users.dto';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserData } from '../types/user.types';
 import { ROLES } from '../enum/roles';
+import { IUserLogin } from '../interfaces/users.interface';
 
 @Controller('users')
 export class UsersController {
@@ -31,6 +33,22 @@ export class UsersController {
         await this._authService.isValidToken(token);
 
         return { statusCode: HttpStatus.OK };
+    }
+
+    @Post('/')
+    @HttpCode(HttpStatus.OK)
+    async loginUser(@Body() userData: LoginUserDto, @Res() res) {
+        const { email, password } = userData;
+
+        const userLoginAction: IUserLogin = await this._userService.login(
+            email,
+        );
+
+        console.log(res);
+
+        return res
+            .header('Authorization', `Bearer ${userLoginAction.token}`)
+            .json({ statusCode: HttpStatus.OK, userId: userLoginAction.id });
     }
 
     @Post('/add/:token')

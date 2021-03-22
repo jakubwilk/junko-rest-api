@@ -1,16 +1,25 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserInitializeToken } from '../types/auth.types';
+import { UserInitializeToken, UserSessionToken } from '../types/auth.types';
 
 @Injectable()
 export class AuthService {
     constructor(private jwtService: JwtService) {}
 
-    async createToken(data: UserInitializeToken): Promise<string> {
+    async createActivateToken(data: UserInitializeToken): Promise<string> {
         const { email, role, expireIn } = data;
 
         return this.jwtService.sign(
             { email: email, role: role },
+            { expiresIn: expireIn },
+        );
+    }
+
+    async createSessionToken(data: UserSessionToken): Promise<string> {
+        const { id, role, expireIn } = data;
+
+        return this.jwtService.sign(
+            { id: id, role: role },
             { expiresIn: expireIn },
         );
     }

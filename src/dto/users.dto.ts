@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 class AddUserDto {
-    @IsEmail({}, { message: 'Wprowadzono niepoprawny adres email' })
+    @IsEmail()
     readonly email: string;
 
     @IsNotEmpty()
@@ -14,4 +14,12 @@ class CreateUserDto {
     readonly password: string;
 }
 
-export { AddUserDto, CreateUserDto };
+class LoginUserDto {
+    @IsEmail()
+    readonly email: string;
+
+    @IsNotEmpty()
+    readonly password: string;
+}
+
+export { AddUserDto, CreateUserDto, LoginUserDto };

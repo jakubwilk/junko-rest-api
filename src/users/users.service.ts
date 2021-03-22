@@ -3,10 +3,11 @@ import { PrismaService } from '../prisma.service';
 import { User } from '@prisma/client';
 import { MailerService } from '../mailer/mailer.service';
 import * as argon2 from 'argon2';
-import { AddUserDto } from '../dto/users.dto';
+import { AddUserDto, LoginUserDto } from '../dto/users.dto';
 import { AuthService } from '../auth/auth.service';
-import { UserInitializeToken } from '../types/auth.types';
+import { UserInitializeToken, UserSessionToken } from '../types/auth.types';
 import { CreateUserData } from '../types/user.types';
+import { IUserLogin } from '../interfaces/users.interface';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +28,7 @@ export class UsersService {
             role: role,
             expireIn: '1h',
         };
-        const token: string = await this._authService.createToken(data);
+        const token: string = await this._authService.createActivateToken(data);
 
         return this._mailerService.sendEmail(email, token);
     }
@@ -59,10 +60,23 @@ export class UsersService {
         return true;
     }
 
-    // async active() {}
-    //
-    // async login() {}
-    //
+    async login(email: string): Promise<IUserLogin> {
+        const user: User = await this._prisma.user.findUnique({
+            where: { email: email },
+        });
+
+        const payload: UserSessionToken = {
+            id: user.id,
+            role: user.role,
+            expireIn: '7d',
+        };
+        const token: string = await this._authService.createSessionToken(
+            payload,
+        );
+
+        return { token: token, id: user.id };
+    }
+
     // async edit() {}
     //
     // async logout() {}
