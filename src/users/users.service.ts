@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { User } from '@prisma/client';
 import { MailerService } from '../mailer/mailer.service';
 import * as argon2 from 'argon2';
-import { AddUserDto, LoginUserDto } from '../dto/users.dto';
+import { AddUserDto } from '../dto/users.dto';
 import { AuthService } from '../auth/auth.service';
 import { UserInitializeToken, UserSessionToken } from '../types/auth.types';
 import { CreateUserData } from '../types/user.types';
@@ -60,10 +60,12 @@ export class UsersService {
         return true;
     }
 
-    async login(email: string): Promise<IUserLogin> {
+    async login(email: string, password: string): Promise<IUserLogin> {
         const user: User = await this._prisma.user.findUnique({
             where: { email: email },
         });
+
+        await this._authService.validUserPassword(user.password, password);
 
         const payload: UserSessionToken = {
             id: user.id,

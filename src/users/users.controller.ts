@@ -42,9 +42,8 @@ export class UsersController {
 
         const userLoginAction: IUserLogin = await this._userService.login(
             email,
+            password,
         );
-
-        console.log(res);
 
         return res
             .header('Authorization', `Bearer ${userLoginAction.token}`)

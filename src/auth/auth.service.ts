@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as argon2 from 'argon2';
 import { UserInitializeToken, UserSessionToken } from '../types/auth.types';
 
 @Injectable()
@@ -45,5 +46,17 @@ export class AuthService {
         const field = await this.jwtService.decode(token);
 
         return field[value];
+    }
+
+    async validUserPassword(
+        hashPassword: string,
+        userPassword: string,
+    ): Promise<boolean> {
+        try {
+            await argon2.verify(hashPassword, userPassword);
+            return true;
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.BAD_REQUEST);
+        }
     }
 }
