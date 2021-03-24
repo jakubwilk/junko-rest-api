@@ -1,11 +1,13 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     HttpStatus,
     Param,
     Post,
+    Put,
     Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -50,7 +52,7 @@ export class UsersController {
             .json({ statusCode: HttpStatus.OK, userId: userLoginAction.id });
     }
 
-    @Post('/add/:token')
+    @Put('/add/:token')
     @HttpCode(HttpStatus.CREATED)
     async createUser(
         @Param('token') token: string,
@@ -81,6 +83,14 @@ export class UsersController {
     @HttpCode(HttpStatus.OK)
     async addUser(@Body() userData: AddUserDto) {
         await this._userService.add(userData);
+
+        return { statusCode: HttpStatus.OK };
+    }
+
+    @Delete('/:userId')
+    @HttpCode(HttpStatus.OK)
+    async deleteUser(@Param('userId') userId: string) {
+        await this._userService.delete(userId);
 
         return { statusCode: HttpStatus.OK };
     }

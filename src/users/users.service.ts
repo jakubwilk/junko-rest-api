@@ -79,6 +79,19 @@ export class UsersService {
         return { token: token, id: user.id };
     }
 
+    async delete(userId: string): Promise<void> {
+        try {
+            await this._prisma.user.update({
+                where: { id: userId },
+                data: {
+                    is_active: false,
+                },
+            });
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // async edit() {}
     //
     // async logout() {}
