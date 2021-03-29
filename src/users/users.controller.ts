@@ -5,9 +5,11 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -16,17 +18,17 @@ export class UsersController {
         private readonly _authService: AuthService,
     ) {}
 
-    @Get('/')
+    @Get('/all')
     async getUsersList() {
         return this._userService.users();
     }
 
-    @Get('/:uid')
-    @HttpCode(HttpStatus.ACCEPTED)
-    async userSession(@Param('uid') uid: string) {
-        console.log(uid);
+    @Get('/')
+    @HttpCode(HttpStatus.OK)
+    async userSession(@Req() req: Request) {
+        console.log(req);
 
-        return { statusCode: HttpStatus.ACCEPTED };
+        return { statusCode: HttpStatus.OK };
     }
 
     @Delete('/:userId')

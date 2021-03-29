@@ -23,6 +23,7 @@ async function bootstrap() {
             dismissDefaultMessages: true,
         }),
     );
-    await app.listen(3000);
+    app.enableCors();
+    await app.listen(4128);
 }
 bootstrap();
