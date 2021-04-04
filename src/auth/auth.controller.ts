@@ -10,7 +10,7 @@ import {
     Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/users.dto';
+import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/auth.dto';
 import { IUserLogin } from '../interfaces/users.interface';
 import { CreateUserData } from '../types/user.types';
 import { ROLES } from '../enum/roles';
@@ -38,11 +38,12 @@ export class AuthController {
     @Post('/')
     @HttpCode(HttpStatus.OK)
     async loginUser(@Body() userData: LoginUserDto, @Res() res) {
-        const { email, password } = userData;
+        const { email, password, isRemember } = userData;
 
         const userLoginAction: IUserLogin = await this._authService.login(
             email,
             password,
+            isRemember,
         );
 
         return res

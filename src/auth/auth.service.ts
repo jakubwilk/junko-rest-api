@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { UserInitializeToken, UserSessionToken } from '../types/auth.types';
-import { AddUserDto } from '../dto/users.dto';
+import { AddUserDto } from '../dto/auth.dto';
 import { CreateUserData } from '../types/user.types';
 import { User } from '@prisma/client';
 import { IUserLogin } from '../interfaces/users.interface';
@@ -62,12 +62,16 @@ export class AuthService {
         hashPassword: string,
         userPassword: string,
     ): Promise<boolean> {
-        try {
-            await argon2.verify(hashPassword, userPassword);
-            return true;
-        } catch (err: unknown) {
-            throw new HttpException(err, HttpStatus.BAD_REQUEST);
+        const isValid: boolean = await argon2.verify(
+            hashPassword,
+            userPassword,
+        );
+
+        if (!isValid) {
+            throw new HttpException(null, HttpStatus.BAD_REQUEST);
         }
+
+        return true;
     }
 
     async add(userData: AddUserDto) {
@@ -109,17 +113,25 @@ export class AuthService {
         return true;
     }
 
-    async login(email: string, password: string): Promise<IUserLogin> {
+    async login(
+        email: string,
+        password: string,
+        isRemember: boolean,
+    ): Promise<IUserLogin> {
         const user: User = await this._prisma.user.findUnique({
             where: { email: email },
         });
+
+        if (user === null) {
+            throw new HttpException(null, HttpStatus.FORBIDDEN);
+        }
 
         await this.validUserPassword(user.password, password);
 
         const payload: UserSessionToken = {
             id: user.id,
             role: user.role,
-            expireIn: '7d',
+            expireIn: isRemember ? '7d' : '24h',
         };
         const token: string = await this.createSessionToken(payload);
 
