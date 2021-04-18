@@ -2,22 +2,35 @@ import {
     Body,
     Controller,
     Get,
+    Headers,
     HttpCode,
     HttpStatus,
     Param,
     Post,
     Put,
     Res,
+    UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/auth.dto';
 import { IUserLogin } from '../interfaces/users.interface';
 import { CreateUserData } from '../types/user.types';
 import { ROLES } from '../enum/roles';
+import { AuthGuard } from './auth.guard';
+import { Roles } from './auth.decorator';
 
+@UseGuards(AuthGuard)
 @Controller('auth')
 export class AuthController {
     constructor(private readonly _authService: AuthService) {}
+
+    @Get('/')
+    @Roles(ROLES.USER, ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async checkUserToken(@Headers('Authorization') authToken: string) {
+        console.log(authToken);
+        return 200;
+    }
 
     @Get('/:token')
     @HttpCode(HttpStatus.OK)

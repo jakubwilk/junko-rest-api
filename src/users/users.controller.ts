@@ -6,11 +6,16 @@ import {
     HttpStatus,
     Param,
     Req,
+    UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
+import { AuthGuard } from '../auth/auth.guard';
+import { ROLES } from '../enum/roles';
+import { Roles } from '../auth/auth.decorator';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
     constructor(
@@ -19,6 +24,7 @@ export class UsersController {
     ) {}
 
     @Get('/all')
+    @Roles(ROLES.USER)
     async getUsersList() {
         return this._userService.users();
     }
