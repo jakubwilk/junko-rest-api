@@ -5,7 +5,6 @@ import {
     HttpStatus,
     Injectable,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { AuthService } from './auth.service';
 
@@ -26,15 +25,17 @@ export class AuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const token = request.headers.authorization;
 
-        if (!token) throw new HttpException('', HttpStatus.UNAUTHORIZED);
+        if (token === undefined)
+            throw new HttpException('', HttpStatus.UNAUTHORIZED);
 
         const isValidToken = await this.authService.isValidToken(
             token.replace('Bearer ', ''),
         );
+
         if (!isValidToken) throw new HttpException('', HttpStatus.UNAUTHORIZED);
 
         const userRole = await this.authService.extractValueFromPayload(
-            token,
+            token.replace('Bearer ', ''),
             'role',
         );
         const userRoles: string[] = [userRole];

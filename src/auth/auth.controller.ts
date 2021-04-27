@@ -2,22 +2,23 @@ import {
     Body,
     Controller,
     Get,
-    Headers,
     HttpCode,
     HttpStatus,
     Param,
     Post,
     Put,
+    Req,
     Res,
+    Response,
     UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/auth.dto';
-import { IUserLogin } from '../interfaces/users.interface';
-import { CreateUserData } from '../types/user.types';
-import { ROLES } from '../enum/roles';
 import { AuthGuard } from './auth.guard';
+import { AuthService } from './auth.service';
 import { Roles } from './auth.decorator';
+import { ROLES } from '../constants/roles';
+import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/auth.dto';
+import { CreateUserData } from '../types/user.types';
+import { IUserLogin } from '../interfaces/users.interface';
 
 @UseGuards(AuthGuard)
 @Controller('auth')
@@ -25,48 +26,53 @@ export class AuthController {
     constructor(private readonly _authService: AuthService) {}
 
     @Get('/')
-    @Roles(ROLES.USER, ROLES.EMPLOYEE, ROLES.OWNER)
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
-    async checkUserToken(@Headers('Authorization') authToken: string) {
-        console.log(authToken);
-        return 200;
-    }
-
-    @Get('/:token')
-    @HttpCode(HttpStatus.OK)
-    async finishAddUser(@Param('token') token: string) {
-        await this._authService.isValidToken(token);
+    async logout(@Res() res) {
+        // console.log(res);
 
         return { statusCode: HttpStatus.OK };
     }
 
-    @Post('/add')
+    @Get('/role')
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
-    async addUser(@Body() userData: AddUserDto) {
-        await this._authService.add(userData);
+    async check(@Req() req) {
+        // console.log(req);
 
         return { statusCode: HttpStatus.OK };
     }
 
     @Post('/')
     @HttpCode(HttpStatus.OK)
-    async loginUser(@Body() userData: LoginUserDto, @Res() res) {
+    async login(@Body() userData: LoginUserDto, @Res() res) {
         const { email, password, isRemember } = userData;
-
         const userLoginAction: IUserLogin = await this._authService.login(
             email,
             password,
             isRemember,
         );
 
-        return res
-            .header('Authorization', `Bearer ${userLoginAction.token}`)
-            .json({ statusCode: HttpStatus.OK, userId: userLoginAction.id });
+        res.header('Authorization', `Bearer ${userLoginAction.token}`).json({
+            statusCode: HttpStatus.OK,
+            userId: userLoginAction.id,
+            token: userLoginAction.token,
+        });
     }
 
-    @Put('/add/:token')
+    @Post('/add')
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE)
+    @HttpCode(HttpStatus.OK)
+    async add(@Body() userData: AddUserDto) {
+        await this._authService.add(userData);
+
+        return { statusCode: HttpStatus.OK };
+    }
+
+    @Put('/:token')
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE)
     @HttpCode(HttpStatus.CREATED)
-    async createUser(
+    async register(
         @Param('token') token: string,
         @Body() userData: CreateUserDto,
     ) {
@@ -84,7 +90,6 @@ export class AuthController {
             password: password,
             role: ROLES[role],
         };
-        data.role = Number(ROLES[data.role]);
 
         await this._authService.create(data);
 

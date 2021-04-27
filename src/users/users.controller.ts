@@ -12,7 +12,7 @@ import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
-import { ROLES } from '../enum/roles';
+import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
 
 @UseGuards(AuthGuard)
@@ -24,7 +24,7 @@ export class UsersController {
     ) {}
 
     @Get('/all')
-    @Roles(ROLES.USER)
+    @Roles(ROLES.CLIENT)
     async getUsersList() {
         return this._userService.users();
     }

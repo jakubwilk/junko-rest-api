@@ -94,10 +94,7 @@ export class AuthService {
         });
 
         if (isEmailUsed !== null) {
-            throw new HttpException(
-                'Podany adres emailowy użytkownika jest już używany',
-                HttpStatus.BAD_REQUEST,
-            );
+            throw new HttpException(null, HttpStatus.BAD_REQUEST);
         }
 
         const passwordHash = await argon2.hash(password);
@@ -123,6 +120,7 @@ export class AuthService {
         });
 
         if (user === null) {
+            console.log('forbidden');
             throw new HttpException(null, HttpStatus.FORBIDDEN);
         }
 
