@@ -12,7 +12,17 @@ generator client {
 }
 
 model User {
-    id          String      @id @default(uuid())
-    email       String      @unique
-    password    String
+    id              String      @id @default(uuid())
+    email           String      @unique
+    password        String
+    role            Int
+    is_active       Boolean     @default(true)
+    created_at      DateTime    @default(now())
+    updated_at      DateTime    @default(now())
+    first_name      String?
+    last_name       String?
+    photo           String?
+    phone_number    String?
+    city            String?
+    description     String?
 }

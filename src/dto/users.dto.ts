@@ -1,0 +1,3 @@
+class UserDto {}
+
+export { UserDto };
