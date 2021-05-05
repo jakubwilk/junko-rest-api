@@ -9,7 +9,6 @@ import {
     Put,
     Req,
     Res,
-    Response,
     UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
@@ -29,23 +28,24 @@ export class AuthController {
     @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async logout(@Res() res) {
-        // console.log(res);
-
         return { statusCode: HttpStatus.OK };
     }
 
     @Get('/role')
-    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
+    // @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async check(@Req() req) {
-        // console.log(req);
+        console.log(req.cookies);
 
         return { statusCode: HttpStatus.OK };
     }
 
     @Post('/')
     @HttpCode(HttpStatus.OK)
-    async login(@Body() userData: LoginUserDto, @Res() res) {
+    async login(
+        @Body() userData: LoginUserDto,
+        @Res({ passthrough: true }) res,
+    ) {
         const { email, password, isRemember } = userData;
         const userLoginAction: IUserLogin = await this._authService.login(
             email,
@@ -53,7 +53,12 @@ export class AuthController {
             isRemember,
         );
 
-        res.header('Authorization', `Bearer ${userLoginAction.token}`).json({
+        // const cookie = `Authentication=${userLoginAction.token}; HttpOnly; Secure; Max-Age=12000`;
+        res.cookie('auth_token', userLoginAction.token, {
+            maxAge: new Date().getTime() + 360000,
+            secure: true,
+            httpOnly: true,
+        }).json({
             statusCode: HttpStatus.OK,
             userId: userLoginAction.id,
             token: userLoginAction.token,
