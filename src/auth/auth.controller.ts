@@ -32,12 +32,16 @@ export class AuthController {
     }
 
     @Get('/role')
-    // @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async check(@Req() req) {
-        console.log(req.cookies);
+        const token: string = req.cookies['auth_token'];
+        const role: string = await this._authService.extractValueFromPayload(
+            token,
+            'role',
+        );
 
-        return { statusCode: HttpStatus.OK };
+        return { statusCode: HttpStatus.OK, userRole: role };
     }
 
     @Post('/')

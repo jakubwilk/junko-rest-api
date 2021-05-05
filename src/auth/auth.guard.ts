@@ -23,19 +23,17 @@ export class AuthGuard implements CanActivate {
         if (!roles) return true;
 
         const request = context.switchToHttp().getRequest();
-        const token = request.headers.authorization;
+        const token = request.cookies['auth_token'];
 
         if (token === undefined)
             throw new HttpException('', HttpStatus.UNAUTHORIZED);
 
-        const isValidToken = await this.authService.isValidToken(
-            token.replace('Bearer ', ''),
-        );
+        const isValidToken = await this.authService.isValidToken(token);
 
         if (!isValidToken) throw new HttpException('', HttpStatus.UNAUTHORIZED);
 
         const userRole = await this.authService.extractValueFromPayload(
-            token.replace('Bearer ', ''),
+            token,
             'role',
         );
         const userRoles: string[] = [userRole];
