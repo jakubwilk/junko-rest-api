@@ -32,7 +32,7 @@ export class AuthController {
     }
 
     @Get('/role')
-    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
+    // @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async check(@Req() req) {
         const token: string = req.cookies['auth_token'];
@@ -40,8 +40,12 @@ export class AuthController {
             token,
             'role',
         );
+        const id: string = await this._authService.extractValueFromPayload(
+            token,
+            'id',
+        );
 
-        return { statusCode: HttpStatus.OK, userRole: role };
+        return { statusCode: HttpStatus.OK, userRole: role, userId: id };
     }
 
     @Post('/')
@@ -56,16 +60,19 @@ export class AuthController {
             password,
             isRemember,
         );
+        const userRole: number = await this._authService.getUserRole(
+            userLoginAction.id,
+        );
 
         // const cookie = `Authentication=${userLoginAction.token}; HttpOnly; Secure; Max-Age=12000`;
         res.cookie('auth_token', userLoginAction.token, {
-            maxAge: new Date().getTime() + 360000,
+            maxAge: 86400000,
             secure: true,
             httpOnly: true,
         }).json({
             statusCode: HttpStatus.OK,
             userId: userLoginAction.id,
-            token: userLoginAction.token,
+            userRole: userRole,
         });
     }
 

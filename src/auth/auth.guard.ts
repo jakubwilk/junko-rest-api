@@ -36,6 +36,7 @@ export class AuthGuard implements CanActivate {
             token,
             'role',
         );
+
         const userRoles: string[] = [userRole];
         const matchRoles = () => userRoles.some((role) => roles.includes(role));
 

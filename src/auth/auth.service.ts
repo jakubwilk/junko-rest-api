@@ -74,6 +74,16 @@ export class AuthService {
         return true;
     }
 
+    async getUserRole(userId: string) {
+        const user: User | null = await this._prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (user === null) return 0;
+
+        return user.role;
+    }
+
     async add(userData: AddUserDto) {
         const { email, role } = userData;
         const data: UserInitializeToken = {
