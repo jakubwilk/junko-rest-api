@@ -32,7 +32,6 @@ export class AuthController {
     }
 
     @Get('/role')
-    // @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async check(@Req() req) {
         const token: string = req.cookies['auth_token'];
@@ -64,7 +63,6 @@ export class AuthController {
             userLoginAction.id,
         );
 
-        // const cookie = `Authentication=${userLoginAction.token}; HttpOnly; Secure; Max-Age=12000`;
         res.cookie('auth_token', userLoginAction.token, {
             maxAge: 86400000,
             secure: true,

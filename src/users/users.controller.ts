@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
+import { UserDto } from '../dto/users.dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -29,12 +30,13 @@ export class UsersController {
         return this._userService.users();
     }
 
-    @Get('/')
+    @Get('/:userId')
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
-    async userSession(@Req() req: Request) {
-        console.log(req);
+    async userSession(@Param('userId') userId: string) {
+        const user: UserDto = await this._userService.user(userId);
 
-        return { statusCode: HttpStatus.OK };
+        return { statusCode: HttpStatus.OK, data: user };
     }
 
     @Delete('/:userId')

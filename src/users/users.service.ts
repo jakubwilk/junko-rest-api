@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
+import { UserDto } from '../dto/users.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,22 @@ export class UsersService {
 
     async users(): Promise<User[] | null> {
         return this._prisma.user.findMany();
+    }
+
+    async user(userId: string): Promise<UserDto | null> {
+        try {
+            const user: User = await this._prisma.user.findUnique({
+                where: { id: userId },
+            });
+
+            return {
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+            };
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.BAD_REQUEST);
+        }
     }
 
     async delete(userId: string): Promise<void> {
