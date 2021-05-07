@@ -75,7 +75,7 @@ export class AuthController {
     }
 
     @Post('/add')
-    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE)
+    @Roles(ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async add(@Body() userData: AddUserDto) {
         await this._authService.add(userData);

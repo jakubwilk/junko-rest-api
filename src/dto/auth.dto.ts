@@ -5,7 +5,7 @@ class AddUserDto {
     readonly email: string;
 
     @IsNotEmpty()
-    readonly role: string;
+    readonly role: number;
 }
 
 class CreateUserDto {
