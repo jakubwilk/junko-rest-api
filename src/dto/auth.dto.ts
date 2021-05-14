@@ -16,6 +16,7 @@ class CreateUserDto {
 
 class LoginUserDto {
     @IsEmail()
+    @IsNotEmpty()
     readonly email: string;
 
     @IsNotEmpty()
@@ -24,4 +25,13 @@ class LoginUserDto {
     readonly isRemember: boolean;
 }
 
-export { AddUserDto, CreateUserDto, LoginUserDto };
+class RegisterUserDto {
+    @IsEmail()
+    @IsNotEmpty()
+    readonly email: string;
+
+    @IsNotEmpty()
+    readonly password: string;
+}
+
+export { AddUserDto, CreateUserDto, LoginUserDto, RegisterUserDto };

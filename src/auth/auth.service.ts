@@ -8,6 +8,7 @@ import { User } from '@prisma/client';
 import { IUserLogin } from '../interfaces/users.interface';
 import { MailerService } from '../mailer/mailer.service';
 import { PrismaService } from '../prisma.service';
+import { ROLES } from '../constants/roles';
 
 @Injectable()
 export class AuthService {
@@ -47,6 +48,17 @@ export class AuthService {
         }
     }
 
+    async validateUserId(
+        userId: string,
+        userIdFromToken: string,
+    ): Promise<boolean> {
+        if (userId !== userIdFromToken) {
+            throw new HttpException(null, HttpStatus.UNAUTHORIZED);
+        }
+
+        return true;
+    }
+
     async extractValueFromPayload(
         token: string,
         value: string,
@@ -84,21 +96,8 @@ export class AuthService {
         return user.role;
     }
 
-    async add(userData: AddUserDto) {
-        const { email, role } = userData;
-        const data: UserInitializeToken = {
-            email: email,
-            role: role,
-            expireIn: '1h',
-        };
-        const token: string = await this.createActivateToken(data);
-
-        return this._mailerService.sendEmail(email, token);
-    }
-
     async create(userData: CreateUserData): Promise<boolean> {
-        const { email, role, password } = userData;
-
+        const { email, password } = userData;
         const isEmailUsed: User | null = await this._prisma.user.findUnique({
             where: { email: email },
         });
@@ -108,14 +107,21 @@ export class AuthService {
         }
 
         const passwordHash = await argon2.hash(password);
-
+        const data: UserInitializeToken = {
+            email: email,
+            role: ROLES.CLIENT,
+            expireIn: '24h',
+        };
+        const token: string = await this.createActivateToken(data);
         await this._prisma.user.create({
             data: {
                 email: email,
                 password: passwordHash,
-                role: role,
+                role: ROLES.CLIENT,
+                is_active: false,
             },
         });
+        await this._mailerService.sendEmail(email, token);
 
         return true;
     }

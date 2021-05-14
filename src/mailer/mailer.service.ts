@@ -20,7 +20,7 @@ export class MailerService {
             subject: 'Dokończenie rejestracji',
             text: 'Twój link autoryzacyjny do ukończenia rejestracji',
             html: `
-                <p>Witaj, by dokończyć proces rejestracji proszę ustawić hasło na konta: <br />
+                <p>Witaj, by dokończyć proces rejestracji prosze kliknąć w poniższy link: <br />
                     <strong>${email}</strong>
                 </p>
                 <a href="http://localhost:3000/users/${token}" target="_blank">http://localhost:3000/users/${token}</a>
@@ -30,10 +30,7 @@ export class MailerService {
         const message = await this._client.send(msg);
 
         if (!message) {
-            throw new HttpException(
-                'Wystąpił błąd podczas wysyłania wiadomości. Proszę skontaktować się z administratorem po więcej informacji.',
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
+            throw new HttpException(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return true;

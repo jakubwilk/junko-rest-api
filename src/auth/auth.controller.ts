@@ -15,7 +15,12 @@ import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { Roles } from './auth.decorator';
 import { ROLES } from '../constants/roles';
-import { AddUserDto, CreateUserDto, LoginUserDto } from '../dto/auth.dto';
+import {
+    AddUserDto,
+    CreateUserDto,
+    LoginUserDto,
+    RegisterUserDto,
+} from '../dto/auth.dto';
 import { CreateUserData } from '../types/user.types';
 import { IUserLogin } from '../interfaces/users.interface';
 
@@ -24,11 +29,20 @@ import { IUserLogin } from '../interfaces/users.interface';
 export class AuthController {
     constructor(private readonly _authService: AuthService) {}
 
-    @Get('/')
+    @Get('/user/:userId')
     @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
-    async logout(@Res() res) {
-        return { statusCode: HttpStatus.OK };
+    async logout(@Param('userId') userId: string, @Req() req, @Res() res) {
+        const token: string = req.cookies['auth_token'];
+        const id: string = await this._authService.extractValueFromPayload(
+            token,
+            'id',
+        );
+        await this._authService.validateUserId(userId, id);
+
+        return res
+            .clearCookie('auth_token')
+            .json({ statusCode: HttpStatus.OK });
     }
 
     @Get('/role')
@@ -45,6 +59,14 @@ export class AuthController {
         );
 
         return { statusCode: HttpStatus.OK, userRole: role, userId: id };
+    }
+
+    @Put('/')
+    @HttpCode(HttpStatus.CREATED)
+    async register(@Body() userData: RegisterUserDto) {
+        await this._authService.create(userData);
+
+        return { statusCode: HttpStatus.CREATED };
     }
 
     @Post('/')
@@ -72,41 +94,5 @@ export class AuthController {
             userId: userLoginAction.id,
             userRole: userRole,
         });
-    }
-
-    @Post('/add')
-    @Roles(ROLES.OWNER)
-    @HttpCode(HttpStatus.OK)
-    async add(@Body() userData: AddUserDto) {
-        await this._authService.add(userData);
-
-        return { statusCode: HttpStatus.OK };
-    }
-
-    @Put('/:token')
-    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE)
-    @HttpCode(HttpStatus.CREATED)
-    async register(
-        @Param('token') token: string,
-        @Body() userData: CreateUserDto,
-    ) {
-        const { password } = userData;
-        const email: string = await this._authService.extractValueFromPayload(
-            token,
-            'email',
-        );
-        const role: string = await this._authService.extractValueFromPayload(
-            token,
-            'role',
-        );
-        const data: CreateUserData = {
-            email: email,
-            password: password,
-            role: ROLES[role],
-        };
-
-        await this._authService.create(data);
-
-        return { statusCode: HttpStatus.CREATED };
     }
 }
