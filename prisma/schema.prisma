@@ -16,13 +16,13 @@ model User {
     email           String      @unique
     password        String
     role            Int
-    is_active       Boolean     @default(true)
+    is_active       Boolean     @default(false)
     created_at      DateTime    @default(now())
     updated_at      DateTime    @default(now())
-    first_name      String?
-    last_name       String?
-    photo           String?
-    phone_number    String?
-    city            String?
-    description     String?
+    first_name      String      @default("")
+    last_name       String      @default("")
+    photo           String      @default("")
+    phone_number    String      @default("")
+    city            String      @default("")
+    description     String      @default("")
 }
