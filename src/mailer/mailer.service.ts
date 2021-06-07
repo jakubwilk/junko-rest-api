@@ -23,7 +23,7 @@ export class MailerService {
                 <p>Witaj, by dokończyć proces rejestracji prosze kliknąć w poniższy link: <br />
                     <strong>${email}</strong>
                 </p>
-                <a href="http://localhost:3000/users/${token}" target="_blank">http://localhost:3000/users/${token}</a>
+                <a href="http://localhost:3000/auth/active/${token}" target="_blank">Aktywuj konto</a>
             `,
         };
 

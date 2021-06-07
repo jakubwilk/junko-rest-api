@@ -136,8 +136,11 @@ export class AuthService {
         });
 
         if (user === null) {
-            console.log('forbidden');
             throw new HttpException(null, HttpStatus.FORBIDDEN);
+        }
+
+        if (!user.is_active) {
+            throw new HttpException(null, HttpStatus.UNAUTHORIZED);
         }
 
         await this.validUserPassword(user.password, password);
