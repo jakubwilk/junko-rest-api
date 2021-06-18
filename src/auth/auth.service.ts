@@ -154,4 +154,29 @@ export class AuthService {
 
         return { token: token, id: user.id };
     }
+
+    async activate(token: string) {
+        await this.isValidToken(token);
+        const id: string = await this.extractValueFromPayload(token, 'id');
+        const user: User | null = await this._prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        if (user.is_active === true) {
+            throw new HttpException(null, HttpStatus.BAD_REQUEST);
+        }
+
+        await this._prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                is_active: true,
+            },
+        });
+
+        return true;
+    }
 }

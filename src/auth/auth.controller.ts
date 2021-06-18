@@ -29,6 +29,14 @@ import { IUserLogin } from '../interfaces/users.interface';
 export class AuthController {
     constructor(private readonly _authService: AuthService) {}
 
+    @Get('/activate/:token')
+    @HttpCode(HttpStatus.ACCEPTED)
+    async active(@Param('token') token: string) {
+        await this._authService.activate(token);
+
+        return { statusCode: HttpStatus.ACCEPTED };
+    }
+
     @Get('/user/:userId')
     @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
