@@ -157,10 +157,13 @@ export class AuthService {
 
     async activate(token: string) {
         await this.isValidToken(token);
-        const id: string = await this.extractValueFromPayload(token, 'id');
+        const email: string = await this.extractValueFromPayload(
+            token,
+            'email',
+        );
         const user: User | null = await this._prisma.user.findUnique({
             where: {
-                id: id,
+                email: email,
             },
         });
 
@@ -170,7 +173,7 @@ export class AuthService {
 
         await this._prisma.user.update({
             where: {
-                id: id,
+                email: email,
             },
             data: {
                 is_active: true,
