@@ -14,7 +14,7 @@ import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
-import { UserDto } from '../dto/users.dto';
+import { UserDto, UsersDto } from '../dto/users.dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -25,9 +25,12 @@ export class UsersController {
     ) {}
 
     @Get('/all')
-    @Roles(ROLES.CLIENT)
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
     async getUsersList() {
-        return this._userService.users();
+        const users: UsersDto[] = await this._userService.users();
+
+        return { statusCode: HttpStatus.OK, data: users };
     }
 
     @Get('/:userId')
