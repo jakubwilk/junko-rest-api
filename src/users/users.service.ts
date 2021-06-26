@@ -15,12 +15,13 @@ export class UsersService {
         const usersList: User[] = await this._prisma.user.findMany();
         const users: UsersDto[] = [];
 
-        usersList.map((user: User, index: number) => {
+        usersList.map((user: User) => {
             const userItem: UsersDto = {
                 id: user.id,
                 email: user.email,
                 firstName: user.first_name,
                 lastName: user.last_name,
+                role: user.role,
                 photo: user.photo,
                 isActive: user.is_active,
                 createdAt: user.created_at,

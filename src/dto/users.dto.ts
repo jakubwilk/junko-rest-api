@@ -9,6 +9,7 @@ class UsersDto {
     readonly email: string;
     readonly firstName: string;
     readonly lastName: string;
+    readonly role: number;
     readonly photo: string;
     readonly isActive: boolean;
     readonly createdAt: Date;
