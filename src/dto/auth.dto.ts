@@ -5,6 +5,9 @@ class AddUserDto {
     readonly email: string;
 
     @IsNotEmpty()
+    readonly password: string;
+
+    @IsNotEmpty()
     readonly role: number;
 }
 

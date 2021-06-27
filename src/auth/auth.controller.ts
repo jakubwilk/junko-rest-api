@@ -77,6 +77,14 @@ export class AuthController {
         return { statusCode: HttpStatus.CREATED };
     }
 
+    @Put('/add/user')
+    @HttpCode(HttpStatus.CREATED)
+    async addUser(@Body() userData: AddUserDto) {
+        console.log(userData);
+
+        return { statusCode: HttpStatus.CREATED };
+    }
+
     @Post('/')
     @HttpCode(HttpStatus.OK)
     async login(
