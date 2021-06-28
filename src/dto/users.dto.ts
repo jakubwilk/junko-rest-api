@@ -15,4 +15,13 @@ class UsersDto {
     readonly createdAt: Date;
 }
 
-export { UserDto, UsersDto };
+class EditUserDto {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly photo: string;
+    readonly role: number;
+    readonly city: string;
+    readonly phoneNumber: string;
+}
+
+export { UserDto, UsersDto, EditUserDto };

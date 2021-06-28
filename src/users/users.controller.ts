@@ -1,10 +1,12 @@
 import {
+    Body,
     Controller,
     Delete,
     Get,
     HttpCode,
     HttpStatus,
     Param,
+    Post,
     Req,
     UseGuards,
 } from '@nestjs/common';
@@ -14,7 +16,7 @@ import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
-import { UserDto, UsersDto } from '../dto/users.dto';
+import { EditUserDto, UserDto, UsersDto } from '../dto/users.dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -31,6 +33,25 @@ export class UsersController {
         const users: UsersDto[] = await this._userService.users();
 
         return { statusCode: HttpStatus.OK, data: users };
+    }
+
+    @Get('/edit/:userId')
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async editUser(@Param('userId') userId: string) {
+        const user: EditUserDto = await this._userService.getEdit(userId);
+
+        return { statusCode: HttpStatus.OK, data: user };
+    }
+
+    @Post('/edit/:userId')
+    @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async saveEditUser(@Param('userId') userId: string, @Body() data: any) {
+        // const user: EditUserDto = await this._userService.getEdit(userId);
+        console.log(userId, data);
+
+        return { statusCode: HttpStatus.OK };
     }
 
     @Get('/:userId')

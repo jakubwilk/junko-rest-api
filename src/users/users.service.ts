@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
-import { UserDto, UsersDto } from '../dto/users.dto';
+import { EditUserDto, UserDto, UsersDto } from '../dto/users.dto';
 
 @Injectable()
 export class UsersService {
@@ -62,7 +62,24 @@ export class UsersService {
         }
     }
 
-    // async edit() {}
-    //
-    // async logout() {}
+    async getEdit(userId: string): Promise<EditUserDto> {
+        try {
+            const user: User = await this._prisma.user.findUnique({
+                where: { id: userId },
+            });
+
+            const userData: EditUserDto = {
+                firstName: user.first_name,
+                lastName: user.last_name,
+                photo: user.photo,
+                role: user.role,
+                city: user.city,
+                phoneNumber: user.phone_number,
+            };
+
+            return userData;
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
