@@ -7,12 +7,10 @@ import {
     HttpStatus,
     Param,
     Post,
-    Req,
     UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
-import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
@@ -48,8 +46,7 @@ export class UsersController {
     @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async saveEditUser(@Param('userId') userId: string, @Body() data: any) {
-        // const user: EditUserDto = await this._userService.getEdit(userId);
-        console.log(userId, data);
+        await this._userService.edit(userId, data);
 
         return { statusCode: HttpStatus.OK };
     }

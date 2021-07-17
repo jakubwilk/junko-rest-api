@@ -62,6 +62,38 @@ export class UsersService {
         }
     }
 
+    async edit(userId: string, data: any): Promise<boolean> {
+        try {
+            await this._prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    first_name: data.firstName,
+                    last_name: data.lastName,
+                    city: data.city,
+                    role: data.role,
+                    phone_number: data.phoneNumber,
+                },
+            });
+
+            if (data.password !== '') {
+                await this._prisma.user.update({
+                    where: {
+                        id: userId,
+                    },
+                    data: {
+                        password: data.password,
+                    },
+                });
+            }
+
+            return true;
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     async getEdit(userId: string): Promise<EditUserDto> {
         try {
             const user: User = await this._prisma.user.findUnique({
