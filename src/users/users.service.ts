@@ -49,12 +49,13 @@ export class UsersService {
         }
     }
 
-    async delete(userId: string): Promise<void> {
+    async toggleActivate(userId: string, isActivate: string): Promise<void> {
         try {
+            const userStatus = isActivate === 'true';
             await this._prisma.user.update({
                 where: { id: userId },
                 data: {
-                    is_active: false,
+                    is_active: userStatus,
                 },
             });
         } catch (err: unknown) {

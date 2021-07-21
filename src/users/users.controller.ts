@@ -60,10 +60,13 @@ export class UsersController {
         return { statusCode: HttpStatus.OK, data: user };
     }
 
-    @Delete('/:userId')
+    @Delete('/:userId/:isActivate')
     @HttpCode(HttpStatus.OK)
-    async deleteUser(@Param('userId') userId: string) {
-        await this._userService.delete(userId);
+    async deleteUser(
+        @Param('userId') userId: string,
+        @Param('isActivate') isActivate: string,
+    ) {
+        await this._userService.toggleActivate(userId, isActivate);
 
         return { statusCode: HttpStatus.OK };
     }
