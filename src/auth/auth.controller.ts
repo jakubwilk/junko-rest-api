@@ -15,13 +15,7 @@ import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { Roles } from './auth.decorator';
 import { ROLES } from '../constants/roles';
-import {
-    AddUserDto,
-    CreateUserDto,
-    LoginUserDto,
-    RegisterUserDto,
-} from '../dto/auth.dto';
-import { CreateUserData } from '../types/user.types';
+import { AddUserDto, LoginUserDto, RegisterUserDto } from '../dto/auth.dto';
 import { IUserLogin } from '../interfaces/users.interface';
 
 @UseGuards(AuthGuard)
@@ -80,7 +74,7 @@ export class AuthController {
     @Put('/add/user')
     @HttpCode(HttpStatus.CREATED)
     async addUser(@Body() userData: AddUserDto) {
-        console.log(userData);
+        await this._authService.add(userData);
 
         return { statusCode: HttpStatus.CREATED };
     }

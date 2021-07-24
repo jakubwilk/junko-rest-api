@@ -96,6 +96,36 @@ export class AuthService {
         return user.role;
     }
 
+    async add(userData: AddUserDto): Promise<boolean> {
+        const { email, password, role } = userData;
+        const isEmailUsed: User | null = await this._prisma.user.findUnique({
+            where: { email: email },
+        });
+
+        if (isEmailUsed !== null) {
+            throw new HttpException(null, HttpStatus.BAD_REQUEST);
+        }
+
+        const passwordHash = await argon2.hash(password);
+        const data: UserInitializeToken = {
+            email: email,
+            role: role,
+            expireIn: '24h',
+        };
+        const token: string = await this.createActivateToken(data);
+        await this._prisma.user.create({
+            data: {
+                email: email,
+                password: passwordHash,
+                role: Number(role),
+                is_active: false,
+            },
+        });
+        await this._mailerService.sendEmail(email, token);
+
+        return true;
+    }
+
     async create(userData: CreateUserData): Promise<boolean> {
         const { email, password } = userData;
         const isEmailUsed: User | null = await this._prisma.user.findUnique({
