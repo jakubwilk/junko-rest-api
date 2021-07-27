@@ -26,3 +26,15 @@ model User {
     city            String      @default("")
     description     String      @default("")
 }
+
+model Order {
+    id              String      @id @default(uuid())
+    title           String
+    clientEmail     String
+    employeeId      String
+    issueTime       DateTime
+    created_at      DateTime    @default(now())
+    updated_at      DateTime    @default(now())
+    status          Int         @default(1)
+    details         String
+}
