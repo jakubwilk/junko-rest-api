@@ -11,6 +11,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { OrdersService } from './orders.service';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
+import { TAddNewOrder } from '../types/order.types';
 
 @UseGuards(AuthGuard)
 @Controller('orders')
@@ -21,16 +22,25 @@ export class OrdersController {
     @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
     async getEmployeesList() {
-        const users: OrderEmployeesDto[] = await this._orderService.getEmplyeesList();
+        const users: OrderEmployeesDto[] = await this._orderService.getEmployeesList();
 
         return { statusCode: HttpStatus.OK, data: users };
     }
 
+    @Get('/all')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async getOrdersList() {
+        const orders: OrderOrdersListDto[] = await this._orderService.getOrdersList();
+
+        return { statusCode: HttpStatus.OK, data: orders };
+    }
+
     @Put('/')
-    @Roles(ROLES.OWNER, ROLES.EMPLOYEE)
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.CREATED)
-    async addOrder(@Body() body) {
-        console.log(body);
+    async addOrder(@Body() body: TAddNewOrder) {
+        await this._orderService.addNewOrder(body);
 
         return { statusCode: HttpStatus.CREATED };
     }
