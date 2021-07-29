@@ -59,7 +59,7 @@ export class OrdersService {
                 throw new HttpException(null, HttpStatus.NOT_FOUND);
             }
 
-            orders.map(async (order: Order) => {
+            for (const order of orders) {
                 const data: OrderOrdersListDto = {
                     client: order.clientEmail,
                     startDate: order.created_at,
@@ -68,10 +68,10 @@ export class OrdersService {
                     status: order.status,
                 };
 
-                // data.employee = await this.getEmployeeName(order.employeeId);
+                data.employee = await this.getEmployeeName(order.employeeId);
 
                 ordersList.push(data);
-            });
+            }
 
             return ordersList.length > 0 ? ordersList : [];
         } catch (err: unknown) {
