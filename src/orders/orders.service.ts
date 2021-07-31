@@ -1,8 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { User, Order } from '@prisma/client';
+import { Order, User } from '@prisma/client';
 import { ROLES } from '../constants/roles';
-import { TAddNewOrder, TNewOrderData } from '../types/order.types';
+import {
+    TAddNewOrder,
+    TEditOrderData,
+    TNewOrderData,
+} from '../types/order.types';
+import {
+    OrderEditOrderDto,
+    OrderEmployeesDto,
+    OrderOrdersListDto,
+} from '../dto/orders.dto';
 
 @Injectable()
 export class OrdersService {
@@ -61,6 +70,7 @@ export class OrdersService {
 
             for (const order of orders) {
                 const data: OrderOrdersListDto = {
+                    orderId: order.id,
                     client: order.clientEmail,
                     startDate: order.created_at,
                     modifyDate: order.updated_at,
@@ -103,6 +113,76 @@ export class OrdersService {
                 data: orderObj,
             });
 
+            return true;
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async editOrder(id: string): Promise<OrderEditOrderDto> {
+        try {
+            const currentOrder: Order | null = await this._prisma.order.findUnique(
+                {
+                    where: {
+                        id: id,
+                    },
+                },
+            );
+            const users: User[] = await this._prisma.user.findMany({
+                where: {
+                    OR: [
+                        {
+                            role: ROLES.EMPLOYEE,
+                        },
+                        {
+                            role: ROLES.OWNER,
+                        },
+                    ],
+                },
+            });
+            const usersList: OrderEmployeesDto[] = [];
+
+            users.map((user: User) => {
+                const userItem: OrderEmployeesDto = {
+                    id: user.id,
+                    firstName: user.first_name,
+                    lastName: user.last_name,
+                };
+
+                usersList.push(userItem);
+            });
+
+            if (currentOrder === null) {
+                throw new HttpException(null, HttpStatus.NOT_FOUND);
+            }
+
+            return { order: currentOrder, users: usersList };
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async saveEditOrder(data: TEditOrderData): Promise<boolean> {
+        const created_at: Date = new Date(data.created_at);
+        const updated_at: Date = new Date();
+        const issueTime: Date = new Date(data.issueTime);
+
+        if (typeof data.status === 'string') {
+            data.status = parseInt(data.status);
+        }
+
+        data.created_at = created_at;
+        data.updated_at = updated_at;
+        data.issueTime = issueTime;
+
+        await this._prisma.order.update({
+            where: {
+                id: data.id,
+            },
+            data: data,
+        });
+
+        try {
             return true;
         } catch (err: unknown) {
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);

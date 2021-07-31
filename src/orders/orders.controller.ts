@@ -4,6 +4,8 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
+    Post,
     Put,
     UseGuards,
 } from '@nestjs/common';
@@ -11,7 +13,8 @@ import { AuthGuard } from '../auth/auth.guard';
 import { OrdersService } from './orders.service';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
-import { TAddNewOrder } from '../types/order.types';
+import { TAddNewOrder, TEditOrderData } from '../types/order.types';
+import { OrderEmployeesDto, OrderOrdersListDto } from '../dto/orders.dto';
 
 @UseGuards(AuthGuard)
 @Controller('orders')
@@ -43,5 +46,24 @@ export class OrdersController {
         await this._orderService.addNewOrder(body);
 
         return { statusCode: HttpStatus.CREATED };
+    }
+
+    @Get('/:orderId')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async editOrder(@Param('orderId') orderId: string) {
+        const editOrderObj = await this._orderService.editOrder(orderId);
+        const { order, users } = editOrderObj;
+
+        return { statusCode: HttpStatus.OK, order: order, users: users };
+    }
+
+    @Post('/')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async saveEditOrder(@Body() body: TEditOrderData) {
+        await this._orderService.saveEditOrder(body);
+
+        return { statusCode: HttpStatus.OK };
     }
 }

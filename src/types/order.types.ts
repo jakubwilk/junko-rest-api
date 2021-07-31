@@ -16,3 +16,15 @@ export type TNewOrderData = {
     status: number;
     details: string;
 };
+
+export type TEditOrderData = {
+    clientEmail: string;
+    created_at: Date;
+    details: string;
+    employeeId: string;
+    id: string;
+    issueTime: Date;
+    status: number;
+    title: string;
+    updated_at: Date;
+};
