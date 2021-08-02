@@ -39,15 +39,6 @@ export class OrdersController {
         return { statusCode: HttpStatus.OK, data: orders };
     }
 
-    @Put('/')
-    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
-    @HttpCode(HttpStatus.CREATED)
-    async addOrder(@Body() body: TAddNewOrder) {
-        await this._orderService.addNewOrder(body);
-
-        return { statusCode: HttpStatus.CREATED };
-    }
-
     @Get('/:orderId')
     @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
@@ -56,6 +47,29 @@ export class OrdersController {
         const { order, users } = editOrderObj;
 
         return { statusCode: HttpStatus.OK, order: order, users: users };
+    }
+
+    @Get('/author/:userId')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async getOrdersListForAuthor(@Param('userId') userId: string) {
+        const data: OrderOrdersListDto[] = await this._orderService.getOrdersListForCurrentAuthor(
+            userId,
+        );
+
+        console.log(userId);
+        console.log(data);
+
+        return { statusCode: HttpStatus.OK, data: data };
+    }
+
+    @Put('/')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.CREATED)
+    async addOrder(@Body() body: TAddNewOrder) {
+        await this._orderService.addNewOrder(body);
+
+        return { statusCode: HttpStatus.CREATED };
     }
 
     @Post('/')

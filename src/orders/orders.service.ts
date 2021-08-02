@@ -59,14 +59,44 @@ export class OrdersService {
         return users;
     }
 
+    async getOrdersListForCurrentAuthor(
+        userId: string,
+    ): Promise<OrderOrdersListDto[]> {
+        try {
+            const orders: Order[] | null = await this._prisma.order.findMany({
+                where: {
+                    employeeId: userId,
+                },
+            });
+            const ordersList: OrderOrdersListDto[] = [];
+
+            for (const order of orders) {
+                const data: OrderOrdersListDto = {
+                    orderId: order.id,
+                    client: order.clientEmail,
+                    startDate: order.created_at,
+                    modifyDate: order.updated_at,
+                    employee: '',
+                    status: order.status,
+                };
+
+                data.employee = await this.getEmployeeName(order.employeeId);
+
+                ordersList.push(data);
+            }
+
+            return ordersList.length > 0 ? ordersList : [];
+
+            return [];
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     async getOrdersList(): Promise<OrderOrdersListDto[]> {
         try {
             const orders: Order[] | null = await this._prisma.order.findMany();
             const ordersList: OrderOrdersListDto[] = [];
-
-            if (orders === null) {
-                throw new HttpException(null, HttpStatus.NOT_FOUND);
-            }
 
             for (const order of orders) {
                 const data: OrderOrdersListDto = {
