@@ -49,6 +49,20 @@ export class OrdersController {
         return { statusCode: HttpStatus.OK, order: order, users: users };
     }
 
+    @Get('/user/:userId')
+    @Roles(ROLES.CLIENT)
+    @HttpCode(HttpStatus.OK)
+    async getOrdersListForUser(@Param('userId') userId: string) {
+        const data: OrderOrdersListDto[] = await this._orderService.getOrdersListForCurrentUser(
+            userId,
+        );
+
+        console.log(userId);
+        console.log(data);
+
+        return { statusCode: HttpStatus.OK, data: data };
+    }
+
     @Get('/author/:userId')
     @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)
