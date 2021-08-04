@@ -57,9 +57,6 @@ export class OrdersController {
             userId,
         );
 
-        console.log(userId);
-        console.log(data);
-
         return { statusCode: HttpStatus.OK, data: data };
     }
 
@@ -70,9 +67,6 @@ export class OrdersController {
         const data: OrderOrdersListDto[] = await this._orderService.getOrdersListForCurrentAuthor(
             userId,
         );
-
-        console.log(userId);
-        console.log(data);
 
         return { statusCode: HttpStatus.OK, data: data };
     }
