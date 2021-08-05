@@ -38,3 +38,12 @@ model Order {
     status          Int         @default(1)
     details         String
 }
+
+model History {
+    id              String      @id @default(uuid())
+    order_id        String
+    title           String
+    created_at      DateTime    @default(now())
+    updated_at      DateTime    @default(now())
+    description     String
+}

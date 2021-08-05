@@ -28,3 +28,27 @@ export type TEditOrderData = {
     title: string;
     updated_at: Date;
 };
+
+export type TAddOrderHistoryData = {
+    id: string;
+    title: string;
+    description: string;
+    time: Date;
+};
+
+export type TAddOrderHistoryDataDb = {
+    order_id: string;
+    title: string;
+    description: string;
+    created_at: Date;
+    updated_at: Date;
+};
+
+export type TOrderHistoryData = {
+    id: string;
+    order_id: string;
+    title: string;
+    created_at: Date;
+    updated_at: Date;
+    description: string;
+};

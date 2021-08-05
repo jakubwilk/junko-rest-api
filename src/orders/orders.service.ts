@@ -1,11 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Order, User } from '@prisma/client';
+import { Order, User, History } from '@prisma/client';
 import { ROLES } from '../constants/roles';
 import {
     TAddNewOrder,
+    TAddOrderHistoryData,
+    TAddOrderHistoryDataDb,
     TEditOrderData,
     TNewOrderData,
+    TOrderHistoryData,
 } from '../types/order.types';
 import {
     OrderEditOrderDto,
@@ -253,6 +256,55 @@ export class OrdersService {
         });
 
         try {
+            return true;
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getOrderHistory(orderId: string): Promise<TOrderHistoryData[]> {
+        try {
+            const history: TOrderHistoryData[] = await this._prisma.history.findMany(
+                {
+                    where: {
+                        order_id: orderId,
+                    },
+                },
+            );
+
+            if (history === null) {
+                return [];
+            }
+
+            return history;
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async addOrderHistory(data: TAddOrderHistoryData): Promise<boolean> {
+        try {
+            const body: TAddOrderHistoryDataDb = {
+                order_id: data.id,
+                title: data.title,
+                created_at: new Date(data.time),
+                updated_at: new Date(),
+                description: data.description,
+            };
+
+            await this._prisma.history.create({
+                data: body,
+            });
+
+            await this._prisma.order.update({
+                where: {
+                    id: data.id,
+                },
+                data: {
+                    status: 2,
+                },
+            });
+
             return true;
         } catch (err: unknown) {
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);

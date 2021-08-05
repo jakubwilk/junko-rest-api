@@ -13,7 +13,12 @@ import { AuthGuard } from '../auth/auth.guard';
 import { OrdersService } from './orders.service';
 import { ROLES } from '../constants/roles';
 import { Roles } from '../auth/auth.decorator';
-import { TAddNewOrder, TEditOrderData } from '../types/order.types';
+import {
+    TAddNewOrder,
+    TAddOrderHistoryData,
+    TEditOrderData,
+    TOrderHistoryData,
+} from '../types/order.types';
 import { OrderEmployeesDto, OrderOrdersListDto } from '../dto/orders.dto';
 
 @UseGuards(AuthGuard)
@@ -87,5 +92,25 @@ export class OrdersController {
         await this._orderService.saveEditOrder(body);
 
         return { statusCode: HttpStatus.OK };
+    }
+
+    @Get('/history/:orderId')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER, ROLES.CLIENT)
+    @HttpCode(HttpStatus.OK)
+    async getCurrentOrderHistory(@Param('orderId') orderId: string) {
+        const history: TOrderHistoryData[] = await this._orderService.getOrderHistory(
+            orderId,
+        );
+
+        return { statusCode: HttpStatus.OK, data: history };
+    }
+
+    @Post('/history')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.CREATED)
+    async addHistoryOrder(@Body() body: TAddOrderHistoryData) {
+        await this._orderService.addOrderHistory(body);
+
+        return { statusCode: HttpStatus.CREATED };
     }
 }
