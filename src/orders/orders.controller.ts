@@ -111,6 +111,6 @@ export class OrdersController {
     async addHistoryOrder(@Body() body: TAddOrderHistoryData) {
         await this._orderService.addOrderHistory(body);
 
-        return { statusCode: HttpStatus.CREATED };
+        return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR };
     }
 }
