@@ -33,6 +33,19 @@ export class UsersController {
         return { statusCode: HttpStatus.OK, data: users };
     }
 
+    @Get('/stats')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async getUsersStatistics() {
+        const data = await this._userService.stats();
+
+        return {
+            statusCode: HttpStatus.OK,
+            users: data.users,
+            employees: data.employees,
+        };
+    }
+
     @Get('/edit/:userId')
     @Roles(ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)

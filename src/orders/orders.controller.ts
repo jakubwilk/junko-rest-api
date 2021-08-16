@@ -35,6 +35,20 @@ export class OrdersController {
         return { statusCode: HttpStatus.OK, data: users };
     }
 
+    @Get('/stats/:id')
+    @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
+    @HttpCode(HttpStatus.OK)
+    async getOrdersStatistics(@Param('id') id: string) {
+        const data = await this._orderService.stats(id);
+
+        return {
+            statusCode: HttpStatus.OK,
+            orders: data.orders,
+            activeOrders: data.activeOrders,
+            userOrders: data.userOrders,
+        };
+    }
+
     @Get('/all')
     @Roles(ROLES.EMPLOYEE, ROLES.OWNER)
     @HttpCode(HttpStatus.OK)

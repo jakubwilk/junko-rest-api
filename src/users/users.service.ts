@@ -2,7 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
-import { EditUserDto, UserDto, UsersDto } from '../dto/users.dto';
+import { EditUserDto, UserDto, UsersDto, UsersStats } from '../dto/users.dto';
+import { ROLES } from '../constants/roles';
 
 @Injectable()
 export class UsersService {
@@ -10,6 +11,31 @@ export class UsersService {
         private _authService: AuthService,
         private _prisma: PrismaService,
     ) {}
+
+    async stats(): Promise<UsersStats> {
+        try {
+            const usersList: User[] = await this._prisma.user.findMany();
+            const employeesList: User[] = await this._prisma.user.findMany({
+                where: {
+                    OR: [
+                        {
+                            role: ROLES.EMPLOYEE,
+                        },
+                        {
+                            role: ROLES.OWNER,
+                        },
+                    ],
+                },
+            });
+
+            const usersAmount: number = usersList.length;
+            const employeesAmount: number = employeesList.length;
+
+            return { users: usersAmount, employees: employeesAmount };
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     async users(): Promise<UsersDto[] | null> {
         const usersList: User[] = await this._prisma.user.findMany();

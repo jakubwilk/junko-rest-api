@@ -24,4 +24,9 @@ class EditUserDto {
     readonly phoneNumber: string;
 }
 
-export { UserDto, UsersDto, EditUserDto };
+class UsersStats {
+    readonly users: number;
+    readonly employees: number;
+}
+
+export { UserDto, UsersDto, EditUserDto, UsersStats };

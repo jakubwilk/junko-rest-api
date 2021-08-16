@@ -19,3 +19,9 @@ export class OrderEditOrderDto {
     order: TNewOrderData;
     users: OrderEmployeesDto[];
 }
+
+export class OrdersStats {
+    orders: number;
+    activeOrders: number;
+    userOrders: number;
+}

@@ -14,6 +14,7 @@ import {
     OrderEditOrderDto,
     OrderEmployeesDto,
     OrderOrdersListDto,
+    OrdersStats,
 } from '../dto/orders.dto';
 
 @Injectable()
@@ -60,6 +61,43 @@ export class OrdersService {
         });
 
         return users;
+    }
+
+    async stats(id: string): Promise<OrdersStats> {
+        try {
+            const ordersList: Order[] = await this._prisma.order.findMany();
+            const activeOrdersList: Order[] = await this._prisma.order.findMany(
+                {
+                    where: {
+                        OR: [
+                            {
+                                status: 1,
+                            },
+                            {
+                                status: 2,
+                            },
+                        ],
+                    },
+                },
+            );
+            const ordersUserList: Order[] = await this._prisma.order.findMany({
+                where: {
+                    employeeId: id,
+                },
+            });
+
+            const ordersAmount: number = ordersList.length;
+            const activeOrdersAmount: number = activeOrdersList.length;
+            const userOrdersAmount: number = ordersUserList.length;
+
+            return {
+                orders: ordersAmount,
+                activeOrders: activeOrdersAmount,
+                userOrders: userOrdersAmount,
+            };
+        } catch (err: unknown) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     async getOrdersListForCurrentUser(
